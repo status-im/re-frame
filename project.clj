@@ -1,4 +1,4 @@
-(defproject dmitryn/re-frame-fork "0.10.2-1"
+(defproject dmitryn/re-frame-fork "0.10.2-2"
   :description  "A Clojurescript MVC-like Framework For Writing SPAs Using Reagent."
   :url          "https://github.com/Day8/re-frame.git"
   :license      {:name "MIT"}

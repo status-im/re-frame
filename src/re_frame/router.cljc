@@ -1,6 +1,6 @@
 (ns re-frame.router
   (:require [re-frame.events  :refer [handle]]
-            [re-frame.interop :refer [after-render empty-queue next-tick]]
+            [re-frame.interop :refer [after-render empty-queue next-tick now]]
             [re-frame.loggers :refer [console]]
             [re-frame.trace   :as trace :include-macros true]))
 
@@ -86,19 +86,28 @@
   (-exception [this ex])
   (-pause [this later-fn])
   (-resume [this])
-  (-call-post-event-callbacks [this event]))
+  (-call-post-event-callbacks [this event])
+
+  ;; -- Perf Metrics
+  (-print-perf-queue-size-if-needed [this queue event-v])
+  (-print-tick-timings-if-needed [this before-tick-t])
+  (-print-perf-timings-if-needed [this before-exec-t scheduled-t after-exec-t event-v])
+  (-store-to-history [this event-name execution-t])
+  (-clear-history [this])
+  (-get-history [this]))
 
 
 ;; Concrete implementation of IEventQueue
 (deftype EventQueue [#?(:cljs ^:mutable fsm-state               :clj ^:volatile-mutable fsm-state)
                      #?(:cljs ^:mutable queue                   :clj ^:volatile-mutable queue)
+                     #?(:cljs ^:mutable history                 :clj ^:volatile-mutable history)
                      #?(:cljs ^:mutable post-event-callback-fns :clj ^:volatile-mutable post-event-callback-fns)]
   IEventQueue
 
   ;; -- API ------------------------------------------------------------------
 
   (push [this event]         ;; presumably called by dispatch
-    (-fsm-trigger this :add-event event))
+    (-fsm-trigger this :add-event [event (now)]))
 
   ;; register a callback function which will be called after each event is processed
   (add-post-event-callback [_ id callback-fn]
@@ -165,18 +174,23 @@
         (when action-fn (action-fn)))))
 
   (-add-event
-    [_ event]
-    (set! queue (conj queue event)))
+    [this event]
+    (set! queue (conj queue event))
+    (-print-perf-queue-size-if-needed this queue event))
 
   (-process-1st-event-in-queue
     [this]
-    (let [event-v (peek queue)]
-      (try
-        (handle event-v)
-        (set! queue (pop queue))
-        (-call-post-event-callbacks this event-v)
+    (let [event-time (peek queue)]
+      (let [event-v (first event-time) scheduled-t (last event-time)]
+        (try
+          (let [before-exec-t (now)]
+            (handle event-v)
+            (-print-perf-timings-if-needed this before-exec-t scheduled-t (now) event-v)
+
+            (set! queue (pop queue))
+            (-call-post-event-callbacks this event-v))
         (catch #?(:cljs :default :clj Exception) ex
-          (-fsm-trigger this :exception ex)))))
+          (-fsm-trigger this :exception ex))))))
 
   (-run-next-tick
     [this]
@@ -186,13 +200,17 @@
   ;; Be aware that events might have metadata which will pause processing.
   (-run-queue
     [this]
-    (loop [n (count queue)]
-      (if (zero? n)
-        (-fsm-trigger this :finish-run nil)
-        (if-let [later-fn (some later-fns (-> queue peek meta keys))]  ;; any metadata which causes pausing?
-          (-fsm-trigger this :pause later-fn)
-          (do (-process-1st-event-in-queue this)
-              (recur (dec n)))))))
+
+    (let [before-tick-t (now)]
+      (loop [n (count queue)]
+        (if (zero? n)
+          (-fsm-trigger this :finish-run nil)
+          (if-let [later-fn (some later-fns (-> queue peek meta keys))]  ;; any metadata which causes pausing?
+            (-fsm-trigger this :pause later-fn)
+            (do (-process-1st-event-in-queue this)
+                (recur (dec n))))))
+      (-print-tick-timings-if-needed this before-tick-t))
+    (-store-to-history this "===NEW-TICK===" 0))
 
   (-exception
     [_ ex]
@@ -211,7 +229,62 @@
   (-resume
     [this]
     (-process-1st-event-in-queue this)  ;; do the event which paused processing
-    (-run-queue this)))                 ;; do the rest of the queued events
+    (-run-queue this))                 ;; do the rest of the queued events
+
+
+  ;; Throughput measuring methods
+  ;; Should be used for debugging
+  (-print-tick-timings-if-needed
+    [this before-tick-t]
+    (if (> (- (now) before-tick-t) 300)
+      (println "[DEBUG / RE-FRAME-PERF]"
+               "TICK TOOK TOO LONG:"  (- (now) before-tick-t) "ms."
+               "TICK HISTORY (newest at the top)***\n"
+               (-get-history this)
+               "\n***TICK HISTORY")))
+
+  (-print-perf-timings-if-needed
+    [this before-exec-t scheduled-t after-exec-t event-v]
+
+    (let [execution-t (- after-exec-t before-exec-t) 
+          throughput-t (- after-exec-t scheduled-t)
+          event-name (first event-v)]
+      (-store-to-history this event-name execution-t)
+      (if (> execution-t 100)
+        (println "[DEBUG / RE-FRAME-PERF]"
+                 "QUEUE ITEM EXECUTION TIME IS > 100ms:" execution-t "ms."
+                 "EVENT" event-name))
+      (if (> throughput-t 300)
+        (println "[DEBUG / RE-FRAME-PERF]"
+                 "QUEUE THROUGHPUT TIME IS > 300ms:" throughput-t "ms."
+                 "EVENT" event-name
+                 "TICK HISTORY (newest at the top)***\n"
+                 (-get-history this)
+                 "\n***TICK HISTORY"))))
+
+  (-print-perf-queue-size-if-needed
+    [this queue event-v]
+    (let [qcount (count queue)]
+      (if (> qcount 10)
+        (println "[DEBUG / RE-FRAME-PERF]"
+                 "QUEUE HAS GROWN TOO MUCH:" qcount
+                 "CURRENT EVENT:" (first event-v)))))
+
+  (-store-to-history
+    [this event-name execution-t]
+
+    (set! history (conj history [event-name execution-t]))
+    (if (> (count history) 100)
+      (set! history (pop history))))
+
+  (-clear-history
+    [this]
+    (set! history empty-queue))
+
+  ;; Stringified, newest to oldest
+  (-get-history
+    [this]
+    (clojure.string/join "\n" (reverse history))))
 
 
 ;; ---------------------------------------------------------------------------
@@ -219,7 +292,7 @@
 ;; When "dispatch" is called, the event is added into this event queue.  Later,
 ;;  the queue will "run" and the event will be "handled" by the registered function.
 ;;
-(def event-queue (->EventQueue :idle empty-queue {}))
+(def event-queue (->EventQueue :idle empty-queue empty-queue {}))
 
 
 ;; ---------------------------------------------------------------------------
