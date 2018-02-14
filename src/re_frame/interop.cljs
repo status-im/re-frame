@@ -3,7 +3,7 @@
             [reagent.core]
             [reagent.ratom]))
 
-(def next-tick goog.async.nextTick)
+(def next-tick js/setTimeout)
 
 (def empty-queue #queue [])
 
