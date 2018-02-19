@@ -89,6 +89,7 @@
   (-call-post-event-callbacks [this event])
 
   ;; -- Perf Metrics
+  (set-debug-enabled! [this val])
   (-print-perf-queue-size-if-needed [this queue event-v])
   (-print-tick-timings-if-needed [this before-tick-t])
   (-print-perf-timings-if-needed [this before-exec-t scheduled-t after-exec-t event-v])
@@ -101,7 +102,8 @@
 (deftype EventQueue [#?(:cljs ^:mutable fsm-state               :clj ^:volatile-mutable fsm-state)
                      #?(:cljs ^:mutable queue                   :clj ^:volatile-mutable queue)
                      #?(:cljs ^:mutable history                 :clj ^:volatile-mutable history)
-                     #?(:cljs ^:mutable post-event-callback-fns :clj ^:volatile-mutable post-event-callback-fns)]
+                     #?(:cljs ^:mutable post-event-callback-fns :clj ^:volatile-mutable post-event-callback-fns)
+                     #?(:cljs ^:mutable is-debug-enabled        :clj ^:volatile-mutable is-debug-enabled)]
   IEventQueue
 
   ;; -- API ------------------------------------------------------------------
@@ -234,9 +236,14 @@
 
   ;; Throughput measuring methods
   ;; Should be used for debugging
+  (set-debug-enabled!
+    [this val]
+    (set! is-debug-enabled val))
+
+
   (-print-tick-timings-if-needed
     [this before-tick-t]
-    (if (> (- (now) before-tick-t) 300)
+    (if (and is-debug-enabled (> (- (now) before-tick-t) 300))
       (println "[DEBUG / RE-FRAME-PERF]"
                "TICK TOOK TOO LONG:"  (- (now) before-tick-t) "ms."
                "TICK HISTORY (newest at the top)***\n"
@@ -245,37 +252,39 @@
 
   (-print-perf-timings-if-needed
     [this before-exec-t scheduled-t after-exec-t event-v]
-
-    (let [execution-t (- after-exec-t before-exec-t) 
-          throughput-t (- after-exec-t scheduled-t)
-          event-name (first event-v)]
-      (-store-to-history this event-name execution-t)
-      (if (> execution-t 100)
-        (println "[DEBUG / RE-FRAME-PERF]"
-                 "QUEUE ITEM EXECUTION TIME IS > 100ms:" execution-t "ms."
-                 "EVENT" event-name))
-      (if (> throughput-t 300)
-        (println "[DEBUG / RE-FRAME-PERF]"
-                 "QUEUE THROUGHPUT TIME IS > 300ms:" throughput-t "ms."
-                 "EVENT" event-name
-                 "TICK HISTORY (newest at the top)***\n"
-                 (-get-history this)
-                 "\n***TICK HISTORY"))))
+    (if is-debug-enabled
+      (let [execution-t (- after-exec-t before-exec-t)
+            throughput-t (- after-exec-t scheduled-t)
+            event-name (first event-v)]
+        (-store-to-history this event-name execution-t)
+        (if (> execution-t 100)
+          (println "[DEBUG / RE-FRAME-PERF]"
+                   "QUEUE ITEM EXECUTION TIME IS > 100ms:" execution-t "ms."
+                   "EVENT" event-name))
+        (if (> throughput-t 300)
+          (println "[DEBUG / RE-FRAME-PERF]"
+                   "QUEUE THROUGHPUT TIME IS > 300ms:" throughput-t "ms."
+                   "EVENT" event-name
+                   "TICK HISTORY (newest at the top)***\n"
+                   (-get-history this)
+                   "\n***TICK HISTORY")))))
 
   (-print-perf-queue-size-if-needed
     [this queue event-v]
-    (let [qcount (count queue)]
-      (if (> qcount 10)
-        (println "[DEBUG / RE-FRAME-PERF]"
-                 "QUEUE HAS GROWN TOO MUCH:" qcount
-                 "CURRENT EVENT:" (first event-v)))))
+    (if is-debug-enabled
+      (let [qcount (count queue)]
+        (if (> qcount 10)
+          (println "[DEBUG / RE-FRAME-PERF]"
+                   "QUEUE HAS GROWN TOO MUCH:" qcount
+                   "CURRENT EVENT:" (first event-v))))))
 
   (-store-to-history
     [this event-name execution-t]
-
-    (set! history (conj history [event-name execution-t]))
-    (if (> (count history) 100)
-      (set! history (pop history))))
+    (if is-debug-enabled
+      (do
+        (set! history (conj history [event-name execution-t]))
+        (if (> (count history) 100)
+          (set! history (pop history))))))
 
   (-clear-history
     [this]
@@ -292,7 +301,7 @@
 ;; When "dispatch" is called, the event is added into this event queue.  Later,
 ;;  the queue will "run" and the event will be "handled" by the registered function.
 ;;
-(def event-queue (->EventQueue :idle empty-queue empty-queue {}))
+(def event-queue (->EventQueue :idle empty-queue empty-queue {} false))
 
 
 ;; ---------------------------------------------------------------------------
