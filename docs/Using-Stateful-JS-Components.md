@@ -87,7 +87,15 @@ D3 (from @zachcp):
   - Example: http://zachcp.github.io/simplecomponent/
 
 A different take on using D3: 
-https://gadfly361.github.io/gadfly-blog/2016-10-22-d3-in-reagent.html
+https://gadfly361.github.io/gadfly-blog/posts-output/2016-10-22-d3-in-reagent/
+
+### JS Interop 
+
+You'll probably need to know how to do interop with js: 
+http://www.spacjer.com/blog/2014/09/12/clojurescript-javascript-interop/
+
+Perhaps use this library to make it even easier:
+https://github.com/binaryage/cljs-oops
 
 ### Advanced Lifecycle Methods
 

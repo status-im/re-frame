@@ -11,7 +11,7 @@ For any re-frame app, there's three things to test:
      be here because this is where most of the logic lives
 
   - **Subscription Handlers** - often not a lot to test here. Only
-    [Layer 2](SubscriptionInfographic.md) subscriptions need testing.
+    [Layer 3](SubscriptionInfographic.md) subscriptions need testing.
 
   - **View functions** - I don't tend to write tests for views. There, I said it.
     Hey!  It is mean to look at someone with that level of disapproval,
@@ -74,7 +74,7 @@ a map literal, like this:
 (let [
       ;; setup - create db and event
       db      {:some 42  :thing "hello"}   ; a literal
-      event   [:select-triange :other :event :args]
+      event   [:select-triangle :other :event :args]
 
       ;; execute
       result-db (select-triange db event)]
@@ -163,7 +163,7 @@ force immediate handling of events, rather than queuing.
 Notes:
   1. we use `dispatch-sync` because `dispatch` is async (event is handled not now, but soon)
   2. Not pure. We are choosing to mutate the global `app-db`. But
-     having said that, there's something about this approach with is remarkably
+     having said that, there's something about this approach which is remarkably
      pragmatic.
   2. the **setup** is now very natural. The associated handlers can be either `-db` or `-fx`
   3. if the handlers have effects other than just updating app-db, we might need to stub out XXX
@@ -173,7 +173,7 @@ If this method appeals to you, you should ABSOLUTELY review the utilities in thi
 [re-frame-test](https://github.com/Day8/re-frame-test).
 
 In summary, event handlers should be easy to test because they are pure functions. The interesting
-part is the unittest "setup" where we need to establishing an initial value for `db`.
+part is the unittest "setup" where we need to establish an initial value for `db`.
 
 ## Subscription Handlers
 
@@ -245,7 +245,7 @@ A trivial example:
 ```
 
 So, here, testing involves passing values into the function and checking the data structure returned
-for correctness.p
+for correctness.
 
 What's returned is hiccup, of course. So how do you test hiccup for correctness?
 
@@ -267,22 +267,22 @@ But what if the View Function has a subscription?
 The use of `subscribe` makes the function impure (it obtains data from places other than its args).
 
 A testing plan might be:
-  1. setup  `app-db` with some values in the right places  (via dispatch of events?)
+  1. setup `app-db` with some values in the right places  (via dispatch of events?)
   2. call `my-view` (with a parameter) which will return hiccup
   3. check the hiccup structure for correctness.
 
 Continuing on, in a second phase you could then:
 
   5. change the value in `app-db`  (which will cause the subscription to fire)
-  6. call view functions again (hiccup returned).
-  7. check the new hiccup for correctness
+  6. call view functions again (hiccup returned)
+  7. check the new hiccup for correctness.
 
 Which is all possible, if a little messy.
 
 ## View Functions - Part 2B
 
 There is a pragmatic method available to handle the impurity: use `with-redefs`
-to stub out `subscribe`.  Like this:
+to stub out `subscribe`. Like this:
 
 ```clj
 (defn subscription-stub [x]
@@ -304,7 +304,7 @@ to render the component in the browser and validate the generated DOM.
 
 Or ... there is another option: you can structure in the first place for pure view functions.
 
-The trick here is to create an outer and inner component.  The outer sources the data
+The trick here is to create an outer and inner component. The outer sources the data
 (via a subscription), and passes it onto the inner as props (parameters).
 
 As a result, the inner component, which does the testable work, is pure and

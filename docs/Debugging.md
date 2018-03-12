@@ -1,3 +1,8 @@
+>  The methods described in this page are now out of date. Included for historical reasons only.  
+> [re-frame-trace](https://github.com/Day8/re-frame-trace) is now our recommeded tool. 
+
+---
+
 ## Debugging
 
 This page describes a technique for 

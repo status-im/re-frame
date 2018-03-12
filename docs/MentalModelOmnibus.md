@@ -1,10 +1,3 @@
-
-> In a rush? You can skip this tutorial page on a first pass. <br>
-> It is quite abstract and it won't directly help you write re-frame code. 
-> On the other hand, it will considerably deepen your understanding 
-> of what re-frame is about, so remember to cycle back and read it later.<br>
-> Next page: [Effectful Handlers](EffectfulHandlers.md)
-
 ## Mental Model Omnibus
 
 <img height="450px" align="right" src="/images/mental-model-omnibus.jpg?raw=true">
@@ -19,7 +12,7 @@ But **there are other perspectives** on re-frame
 which will deepen your understanding.
 
 This tutorial is a tour of these ideas, justifications and insights.  
-It is a little rambling, but I'm hoping it will deliver for you
+It is a little rambling, but the goal is for it to deliver for you
 at least one "Aaaah, I see" moment before the end.
 
 > If a factory is torn down but the rationality which produced it is
@@ -348,20 +341,6 @@ compelled by different kinds of forces at different times (gravity, convection, 
 With this focus on interconnections, we have been looking on the "forces"  part of the loop.  The transport.
 
 
-## Full Stack
-
-If you like re-frame and want to take the principles full-stack, then
-these resources might be interesting to you:
-
-Commander Pattern  
-https://www.youtube.com/watch?v=B1-gS0oEtYc
-
-Datalog All The Way Down  
-https://www.youtube.com/watch?v=aI0zVzzoK_E
-
-Reactive PostgreSQL:
-https://yogthos.net/posts/2016-11-05-LuminusPostgresNotifications.html
-
 ## What Of This Romance?
 
 My job is to be a relentless cheerleader for re-frame, right?
@@ -380,9 +359,8 @@ Your love for re-frame will be deep, abiding and enriching.
 
 ***
 
-Previous:  [The API](API.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Up:  [Index](README.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Next:  [Infographic Overview](EventHandlingInfographic.md)
+[Index](README.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 
 
 [SPAs]:http://en.wikipedia.org/wiki/Single-page_application

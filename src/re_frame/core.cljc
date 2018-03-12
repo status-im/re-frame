@@ -191,6 +191,10 @@
       (reset! db/app-db app-db)
       nil)))
 
+(defn purge-event-queue
+  "Remove all events queued for processing"
+  []
+  (router/purge re-frame.router/event-queue))
 
 ;; -- Event Processing Callbacks  ---------------------------------------------
 
@@ -224,10 +228,10 @@
 ;; Assisting the v0.7.x ->  v0.8.x transition.
 (defn register-handler
   [& args]
-  (console :warn  "re-frame:  \"register-handler\" has been renamed \"reg-event-db\" (look for registration of " (str (first args)) ")")
+  (console :warn  "re-frame:  \"register-handler\" has been renamed \"reg-event-db\" (look for registration of" (str (first args)) ")")
   (apply reg-event-db args))
 
 (defn register-sub
   [& args]
-  (console :warn  "re-frame:  \"register-sub\" is deprecated. Use \"reg-sub-raw\" (look for registration of " (str (first args)) ")")
+  (console :warn  "re-frame:  \"register-sub\" is deprecated. Use \"reg-sub-raw\" (look for registration of" (str (first args)) ")")
   (apply reg-sub-raw args))

@@ -38,7 +38,11 @@
   (js/setTimeout f ms))
 
 (defn now []
-  (js/Date.now))
+  (if (and
+       (exists? js/performance)
+       (exists? js/performance.now))
+    (js/performance.now)
+    (js/Date.now)))
 
 (defn reagent-id
   "Produces an id for reactive Reagent values

@@ -62,29 +62,29 @@ Perhaps:
 
 ## It Leverages Data
 
-You might already know that ClojureScript is a modern lisp, and that
-lisps are **homoiconic**.  If not, you do now.
+You might already know that ClojureScript is a modern Lisp, and that
+Lisps are **homoiconic**.  If not, you do now.
 
-That homoiconic bit is significant. It means you program in a lisp by creating and
-assembling lisp data structures. Dwell on that for a moment. You are **programming in data**. 
+This homoiconic bit is significant. It means you program in a Lisp by creating and
+assembling Lisp data structures. Dwell on that for a moment. You are **programming in data**. 
 The functions which later transform data, themselves start as data.
 
-Clojure programmers place particular 
-emphasis on the primacy of data. When they aren't re-watching Rich Hickey videos, 
-and wishing their hair was darker and more curly, 
-they meditate on aphorisms like **Data is the ultimate in late binding**.
+Clojure programmers place particular emphasis on the primacy of data, and 
+they like to meditate on aphorisms like **data is the ultimate in late binding**. 
+(Less productively, they also like re-watching Rich Hickey videos, and wishing
+their hair was darker and more curly)
 
 I cannot stress enough what a big deal this is. It may seem 
 like a syntax curiosity at first but, when the penny drops for 
 you on this, it tends to be a profound moment. And once you 
 understand the importance of this concept at the language level, 
-you naturally want to leverage similar power at the library level.
+you naturally want to leverage similar power at the library and system levels.
 
 So, it will come as no surprise, then, to know that re-frame has a 
 data oriented design. Events are data. Effects are data. DOM is data.
 The functions which transform data are registered and looked up via 
 data. Interceptors (data) are preferred over middleware (higher 
-order functions). Etc.
+order functions). Etc. 
 
 **Data - that's the way we roll.**
 
@@ -94,7 +94,7 @@ order functions). Etc.
 Architecturally, re-frame implements "a perpetual loop".
 
 To build an app, you hang pure functions on certain parts of this loop, 
-and re-frame looks after the `conveyance of data` 
+and re-frame looks after the **conveyance of data** 
 around the loop, into and out of the transforming functions you 
 provide - hence a tag line of "Derived Values, Flowing".
 
@@ -317,7 +317,7 @@ register this `h` as the handler for  `:delete-item` events, like this:
 ```clj
 (re-frame.core/reg-event-fx   ;; a part of the re-frame API
   :delete-item                ;; the kind of event
-  h)                         ;; the handler function for this kind of event
+  h)                          ;; the handler function for this kind of event
 ```
 
 `h` is written to take two arguments: 
@@ -329,11 +329,11 @@ it returns a map of `effects` - a description of those changes.
 
 Here's a sketch (we are at 30,000 feet):
 ```clj
-(defn h                               ;; choose a better name like delete-item
- [coeffects event]                    ;; args:  db from coeffect, event
+(defn h                               ;; maybe choose a better name like `delete-item`
+ [coeffects event]                    ;; `coeffects` holds the current state of the world.  
  (let [item-id (second event)         ;; extract id from event vector
        db      (:db coeffects)]       ;; extract the current application state
-   {:db  (dissoc-in db [:items item-id])})) ;; effect is change app state
+   {:db  (dissoc-in db [:items item-id])})) ;; effect is "change app state to ..."
 ```
 
 re-frame has ways (described in later tutorials) to inject necessary aspects
@@ -342,12 +342,12 @@ event handlers need different "things" to get their job done. But
 current "application state" is one aspect of the world which is 
 invariably needed, and it is available by default in the `:db` key.
 
-BTW, here is a more idiomatic rewrite of `h` which uses "destructuring" of the args: 
+BTW, here is a more idiomatic rewrite of `h` which uses `destructuring` of the args: 
 
 ```clj
 (defn h 
- [{:keys [db]} [_ item-id]]    ;; <--- new: obtain db and id directly
- {:db  (dissoc-in db [:items item-id])}) ;; same as before
+  [{:keys [db]} [_ item-id]]    ;; <--- new: obtain db and id directly
+  {:db  (dissoc-in db [:items item-id])}) ;; same as before
 ```
 
 

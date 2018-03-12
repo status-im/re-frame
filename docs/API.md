@@ -15,7 +15,7 @@ Orientation:
      but, as a substitute, 
      the links below take you to the doc-strings of often-used API functions.
 
-## Doc Strings For API Functions 
+## Doc Strings For The Significant API Functions 
 
 The core API consists of: 
   - [dispatch](/src/re_frame/router.cljc#L229-L239) or [dispatch-sync](/src/re_frame/router.cljc#L247-L259).
@@ -28,7 +28,7 @@ Occasionally, you'll need to use:
      
 And, finally, there are the builtin Interceptors:
   - [path](/src/re_frame/std_interceptors.cljc#L152-L176)
-  - [after](/src/re_frame/std_interceptors.cljc#L264-L274)
+  - [after](/src/re_frame/std_interceptors.cljc#L279-L300)
   - [debug](/src/re_frame/std_interceptors.cljc#L13-L38)
   - and browse [the others](/src/re_frame/std_interceptors.cljc)
   
@@ -65,24 +65,25 @@ usage:
  
 #### :dispatch-n
 
-`dispatch` more than one event. Expects a collection events.
+`dispatch` more than one event. Expects a collection events. 
 
 usage:
 ```clj
 {:dispatch-n (list [:do :all] [:three :of] [:these])}
 ```
-
-Note: nil events are ignored which means events can be added
+Note 1: The events supplied will be dispatched in the order provided.
+Note 2: nil events are ignored which means events can be added
 conditionally:
 ```clj
 {:dispatch-n (list (when (> 3 5) [:conditioned-out])
                    [:another-one])}
 ```
+
 *** 
 #### :deregister-event-handler
 
-removes a previously registered event handler. Expects either a single id (
-typically a keyword), or a seq of ids.
+removes a previously registered event handler. Expects either a single id
+(typically a keyword), or a seq of ids.
 
 usage:
 ```clj
@@ -104,9 +105,9 @@ usage:
 
 *** 
 
-Previous:  [First Code Walk-Through](CodeWalkthrough.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Previous:  [Infographic: A re-frame Epoch](AnEpoch.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Up:  [Index](README.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Next: [Mental Model Omnibus](MentalModelOmnibus.md)
+Next: [Infographic: Event Processing](EventHandlingInfographic.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->

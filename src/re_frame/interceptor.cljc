@@ -2,6 +2,7 @@
   (:require
     [re-frame.loggers :refer [console]]
     [re-frame.interop :refer [empty-queue debug-enabled?]]
+    [re-frame.trace :as trace :include-macros true]
     [clojure.set :as set]))
 
 
@@ -20,7 +21,7 @@
     (if-let [unknown-keys (seq (set/difference
                                 (-> m keys set)
                                 mandatory-interceptor-keys))]
-      (console :error "re-frame: ->interceptor " m " has unknown keys:" unknown-keys)))
+      (console :error "re-frame: ->interceptor" m "has unknown keys:" unknown-keys)))
   {:id     (or id :unnamed)
    :before before
    :after  after })
@@ -192,6 +193,8 @@
    already done.  In advanced cases, these values can be modified by the
    functions through which the context is threaded."
   [event-v interceptors]
+  (trace/merge-trace!
+    {:tags {:interceptors interceptors}})
   (-> (context event-v interceptors)
       (invoke-interceptors :before)
       change-direction

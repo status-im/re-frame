@@ -2,6 +2,10 @@
 
 Please add to this list by submitting a pull request.
 
+### IDE Support 
+
+*  Cursive - has direct support for re-frame features: [example](https://github.com/cursive-ide/cursive/issues/1816) and [example](https://github.com/cursive-ide/cursive/issues/1549)
+*  Emacs - https://github.com/oliyh/re-jump.el
 
 ### Templates
 
@@ -14,8 +18,10 @@ Please add to this list by submitting a pull request.
 
 ### Examples and Applications Using re-frame
 
+* [RealWorld](https://github.com/jacekschae/conduit) - heavily inspired by [todomvc](https://github.com/Day8/re-frame/tree/master/examples/todomvc) - well commented codebase with CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 * [BlueGenes](https://github.com/intermine/bluegenes) - searching and analysing genomic data, by the University of Cambridge
 * [Memento](https://gitlab.com/Numergent/memento) a private note-taking app. Uses compojure-api, PostgreSQL and token auth.
+* [RealWord](https://github.com/polymeris/re-frame-realword-example-app) has CRUD, auth. Adheres to [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 * [How to create decentralised apps with re-frame and Ethereum](https://medium.com/@matus.lestan/how-to-create-decentralised-apps-with-clojurescript-re-frame-and-ethereum-81de24d72ff5#.b9xh9xnis) - Tutorial with links to code and live example.
 * [Braid](https://github.com/braidchat/braid) - A new approach to group chat, designed around conversations and tags instead of rooms.
 * [Elfeed-cljsrn](https://github.com/areina/elfeed-cljsrn) - A mobile client for [Elfeed](https://github.com/skeeto/elfeed) rss reader, built with React Native.
@@ -29,6 +35,10 @@ Please add to this list by submitting a pull request.
 * [boodle](https://github.com/manuel-uberti/boodle) - A simple SPA for
   accounting. It uses, among others, re-frame, http-kit, compojure-api and it
   runs on PostgreSQL.
+* [status-react](https://github.com/status-im/status-react) - A mobile OS for Ethereum. Server, SPA + React Native App
+* [Catlantis](https://github.com/madvas/catlantis) - React Native App about cats
+* [Lymchat](https://github.com/tiensonqin/lymchat) - React Native App to learn different cultures
+* [ventas](https://github.com/JoelSanchez/ventas) - Ecommerce platform made with a full-clojure stack
 
 ### Effect and CoEffect Handlers
 
@@ -53,11 +63,25 @@ Please add to this list by submitting a pull request.
 * [re-frame-undo](https://github.com/Day8/re-frame-undo) - An undo library for re-frame
 * [re-frame-test](https://github.com/Day8/re-frame-test) - Advanced testing utilities
 * [Animation](http://www.upgradingdave.com/blog/posts/2016-12-17-permutation.html) using `react-flip-move`
-* [re-frisk](https://github.com/flexsurfer/re-frisk) - A library for visualizing re-frame data and events.
 * [re-thread](https://github.com/yetanalytics/re-thread) - A library for running re-frame applications in Web Workers.
 * [re-frame-datatable](https://github.com/kishanov/re-frame-datatable) - DataTable UI component built for use with re-frame.
 * [Stately: State Machines](https://github.com/nodename/stately) also https://www.youtube.com/watch?v=klqorRUPluw
 * [re-learn](https://github.com/oliyh/re-learn) - Data driven tutorials for educating users of your reagent / re-frame app
+* [subgraph](https://github.com/vimsical/subgraph) - Reactive graph database for re-frame
+* [re-graph](https://github.com/oliyh/re-graph) - GraphQL client for re-frame
+* [martian](https://github.com/oliyh/martian) - Swagger-compatible API client that abstracts away from HTTP with [re-frame bindings](https://github.com/oliyh/martian/tree/master/re-frame)
+
+#### Debugging
+
+
+* [re-frame-trace](https://github.com/Day8/re-frame-trace) - A debugging dashboard for re-frame
+* [re-frisk](https://github.com/flexsurfer/re-frisk) - A library for visualizing re-frame data and events.
+
+#### React Native
+
+* [re-natal](https://github.com/drapanjanas/re-natal): Bootstrap ClojureScript React Native apps
+* [cljsrn-re-frame-workers](https://github.com/seantempesta/cljsrn-re-frame-workers): A library supporting react-native-workers with re-frame for ClojureScript and React Native.
+* [re-navigate](https://github.com/vikeri/re-navigate): Example of React Native Navigation with re-frame/re-natal
 
 ### Videos
 
@@ -75,6 +99,8 @@ Please add to this list by submitting a pull request.
 * [Server Side Rendering with re-frame](http://davidtanzer.net/server_side_rendering_with_re_frame) - Blog post on rendering re-frame views with Clojure.
 
 * [Rendering Reagent on the Server Using Hiccup](http://yogthos.net/posts/2015-11-24-Serverside-Reagent.html)- Blog post on rendering Reagent with Clojure.
+
+* [Prerendering a re-frame app with Chrome Headless](https://medium.com/@joelsanchezclj/prerendering-a-re-frame-app-with-chrome-headless-bb875de31fd0) - Blog post on prerendering a re-frame app using [etaoin](https://github.com/igrishaev/etaoin) and Chrome Headless.
 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->

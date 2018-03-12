@@ -1,4 +1,35 @@
-## Unreleased 0.10.2  (2017.10.07)
+## 0.10.5 (Unreleased)
+
+#### Changed
+
+- Event handlers and fx are now traced, to provide more granular timing info in re-frame-trace. This has no impact on your code execution if you haven't [enabled tracing](https://github.com/Day8/re-frame-trace#installation).
+
+## 0.10.4 (2018.01.31)
+
+#### Changed
+
+- Interceptors, effects, and coeffects are now captured in re-frame's tracing.
+
+
+## 0.10.3 (2018.01.24)
+
+#### New
+
+  - add `purge-event-queue` to the API. See https://github.com/Day8/re-frame-test/issues/13 for motivation.
+  - added [a new FAQ entry](/docs/FAQs/DoINeedReFrame.md) Reagent looks terrific. Why do I need re-frame?
+  - added [a new Infographic](/docs/AnEpoch.md) explaining how dominoes play out over time in the browser
+
+#### Changed
+
+  - Debounce trace callbacks to handle larger batches of traces at once, to improve efficiency.
+  - Improved error messages to not have multiple spaces before variables.
+
+#### Fixed
+
+  - Handle js/performance not being defined in NodeJS. [#439](https://github.com/Day8/re-frame/pull/439)
+  - Improve cache eviction behaviour of subscription caches. In more complex applications a subscription may have been unnecessarily created and destroyed several times after a Figwheel re-render.
+
+## 0.10.2  (2017.10.07)
 
 #### New Features
 
@@ -23,19 +54,19 @@
   - added [API documentation](/docs/API.md)
   - added [testing docs](/docs/Testing.md)
   - added [a new mental model](/docs/MentalModelOmnibus.md#on-dsls-and-machines)
-  - added [a new FAQ entry](/docs/FAQs/When-Does-Dispatch-Happen.md) on dispatch processing 
+  - added [a new FAQ entry](/docs/FAQs/When-Does-Dispatch-Happen.md) on dispatch processing
   - added [a new FAQ entry](/docs/FAQs/DB_Normalisation.md) on representing normalised data in `app-db`
   - added [a new FAQ entry](/docs/FAQs/GlobalInterceptors.md) on how to register a global interceptor
-  
+
 #### Breaking
 
   - [#357](https://github.com/Day8/re-frame/pull/357)
-    I'd be amazed if this actually broke any apps. Shocked! But, better safe than sorry. 
+    I'd be amazed if this actually broke any apps. Shocked! But, better safe than sorry.
     The effect handler for `:db` has changed: if the new value provided tests
-    `identical?` to the existing value within `app-db`, then `app-db` is not `reset!`. 
-    Previously, `app-db` was always `reset!` irrespective, 
-    which potentially caused Layer 2 subscriptions to run unnecessarily. So this is a tiny 
-    efficiency change in this edge case, and it results in behaviour that better matches 
+    `identical?` to the existing value within `app-db`, then `app-db` is not `reset!`.
+    Previously, `app-db` was always `reset!` irrespective,
+    which potentially caused Layer 2 subscriptions to run unnecessarily. So this is a tiny
+    efficiency change in this edge case, and it results in behaviour that better matches
     programmer intuitions.
 
 #### Minor Fixes and Improvements
@@ -189,7 +220,7 @@ Joking aside, this is a substantial release which will change how you use re-fra
   - the undo/redo features buried in re-frame has been factored out into
    [a standalone library](https://github.com/Day8/re-frame-undo).
 
-    undo and redo have been a part of re-frame from the beginning, but they have never officially  
+    undo and redo have been a part of re-frame from the beginning, but they have never officially
     been made a part of the API, and have not been documented. So it nice to see it available, and fully
     documented.
 
@@ -206,7 +237,7 @@ Joking aside, this is a substantial release which will change how you use re-fra
     But recently @steveb8n gave a cljsyd talk on
     Pedestal's Interceptor pattern which suddenly transformed them from
     arcane to delightfully simple in 20 mins. Interceptors are
-    really "middleware via data" rather than "middleware via higher order functions".  
+    really "middleware via data" rather than "middleware via higher order functions".
     So it is another way of doing the same thing, but thanks to @steveb8n
     Interceptors appear a more flexible base, and simpler.
 

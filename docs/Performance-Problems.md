@@ -1,19 +1,5 @@
 ## Eek! Performance Problems
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-## Table Of Contents
-
-- [1. Is It The `debug` Interceptor?](#1-is-it-the-debug-interceptor)
-- [2. `=` On Big Structures](#2--on-big-structures)
-  - [An Example Of Problem 2](#an-example-of-problem-2)
-  - [Solutions To Problem 2](#solutions-to-problem-2)
-- [3. Are you Using a React `key`?](#3-are-you-using-a-react-key)
-- [4. Callback Functions](#4-callback-functions)
-- [A Weapon](#a-weapon)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ## 1. Is It The `debug` Interceptor?
 
 This first one is something of a non-problem. 
@@ -127,19 +113,19 @@ Some resources:
 
 ## 4. Callback Functions
 
-Look at this `div`:
+Consider this `div`:
 ```
 [:div  {:on-mouse-over  (fn [event] ....)  }   "hello"]
 ```
 
-Every time it is rendered, that `:on-mouse-over` function will be regenerated, 
-and it will NOT test `=` to the last time it rendered.  It will appear to be a new function. 
-It will appear to React that it has to replace the event handler. 
+On every render, that `:on-mouse-over` function will be regenerated, 
+and the one generated "this time" will NOT test `=` to the one generated "last time". 
+It will appear to be a new function. React will conclude that it must replace this event handler. 
   
 Most of the time, this is not an issue.  But if you are generating a LOT of DOM
 this small inefficiency can add up.  
 
-To work around the problem, lift the function out of the render.  Use a Form-2 function like this:
+To work around the problem, lift the function generation out of the render.  Use a `Form-2` function like this:
 ```
 (defn my-component 
    []
@@ -153,17 +139,20 @@ the event handler has been replaced.
 
 But like I say, don't be too paranoid about this, it is unlikely
 to be an issue unless you have something like a table with a 
-lot of rows. 
+lot of identical cells.
 
+## Use The Trace
 
-## A Weapon 
+If you want to know exactly what's going on, get some X-Ray vision
+from the [official tracer](https://github.com/Day8/re-frame-trace). See exactly what subscriptions are running, what views are getting re-rendered, etc.
 
-Of course, the way to really track down what is going on is to 
-use the [OFFICIAL debugging technique](https://github.com/Day8/re-frame/wiki/Debugging). 
-See the four dominoes play out in the console. You may be surprised 
-by what you find is happening. 
+You may be surprised by what you see.
 
-Be aware that tracing adds its own performance drag - there's the 
+## The Old Weapon
+
+In the old days, we had a different, clumsier [tracing technique](https://github.com/Day8/re-frame/wiki/Debugging). 
+
+Be aware that this OLD method of tracing adds its own performance drag - there's the 
 overhead of all that stuff getting written on the js console. 
 Especially if the data getting traced is big - for example, 
 tracing all of `app-db` in the console can take a while and force 
@@ -171,4 +160,8 @@ Chrome devtools to take masses of RAM.  So you may want to selectively
 add tracing when poking about. 
 
 
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

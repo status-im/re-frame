@@ -7,7 +7,8 @@
     [re-frame.db :refer [app-db]]
     [clojure.data :as data]
     [re-frame.cofx :as cofx]
-    [re-frame.utils :as utils]))
+    [re-frame.utils :as utils]
+    [re-frame.trace :as trace :include-macros true]))
 
 
 (def debug
@@ -106,9 +107,19 @@
     :id     :db-handler
     :before (fn db-handler-before
               [context]
-              (let [{:keys [db event]} (:coeffects context)]
-                (->> (handler-fn db event)
-                     (assoc-effect context :db))))))
+              (let [new-context
+                    (trace/with-trace
+                      {:op-type   :event/handler
+                       :operation (get-in context [:coeffects :event])}
+                      (let [{:keys [db event]} (:coeffects context)]
+                        (->> (handler-fn db event)
+                             (assoc-effect context :db))))]
+                ;; We merge these tags outside of the :event/handler trace because we want them to be assigned to the parent
+                ;; wrapping trace.
+                (trace/merge-trace!
+                  {:tags {:effects   (:effects new-context)
+                          :coeffects (:coeffects context)}})
+                new-context))))
 
 
 (defn fx-handler->interceptor
@@ -129,9 +140,17 @@
   :id     :fx-handler
   :before (fn fx-handler-before
             [context]
-            (let [{:keys [event] :as coeffects} (:coeffects context)]
-              (->> (handler-fn coeffects event)
-                   (assoc context :effects))))))
+            (let [{:keys [event] :as coeffects} (:coeffects context)
+                  new-context
+                  (trace/with-trace
+                    {:op-type   :event/handler
+                     :operation (get-in context [:coeffects :event])}
+                    (->> (handler-fn coeffects event)
+                         (assoc context :effects)))]
+              (trace/merge-trace!
+                {:tags {:effects   (:effects new-context)
+                        :coeffects (:coeffects context)}})
+              new-context))))
 
 
 (defn ctx-handler->interceptor
@@ -143,7 +162,17 @@
   [handler-fn]
   (->interceptor
     :id     :ctx-handler
-    :before handler-fn))
+    :before (fn ctx-handler-before
+              [context]
+              (let [new-context
+                    (trace/with-trace
+                      {:op-type   :event/handler
+                       :operation (get-in context [:coeffects :event])}
+                      (handler-fn context))]
+                (trace/merge-trace!
+                  {:tags {:effects   (:effects new-context)
+                          :coeffects (:coeffects context)}})
+                new-context))))
 
 
 ;; -- Interceptors Factories -  PART 2 ------------------------------------------------------------
