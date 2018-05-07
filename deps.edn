@@ -3,11 +3,4 @@
          org.clojure/clojurescript  {:mvn/version "1.9.908"}
          reagent                    {:mvn/version "0.7.0"}
          net.cgrand/macrovich       {:mvn/version "0.2.0"}
-         org.clojure/tools.logging  {:mvn/version "0.3.1"}}
-
- :aliases
- {:dev {:extra-deps
-         {;; Figwheel ClojureScript REPL
-          karma-reporter            {:mvn/version "1.0.1"}
-          binaryage/devtools        {:mvn/version "0.9.4"}}}
-  }}
+         org.clojure/tools.logging  {:mvn/version "0.3.1"}}}
